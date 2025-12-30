@@ -11,8 +11,8 @@ export type ObserverLogEntry = {
 };
 
 export type ObserverConfig = {
-  baseUrl: string;
-  apiKey: string;
+  baseUrl?: string;
+  apiKey?: string;
   appName: string;
   source?: string;
   componentId?: string;
@@ -28,22 +28,76 @@ type SendPayload = {
   logs: ObserverLogEntry[];
 };
 
+type ResolvedObserverConfig = ObserverConfig & {
+  baseUrl: string;
+  apiKey: string;
+};
+
 const DEFAULT_BATCH_SIZE = 25;
 const DEFAULT_FLUSH_INTERVAL = 3000;
 
+const readEnvValue = (key: string) => {
+  if (typeof process !== "undefined" && process.env && process.env[key]) {
+    return process.env[key];
+  }
+  const globalEnv = globalThis as Record<string, unknown>;
+  if (typeof globalEnv[key] === "string") {
+    return globalEnv[key] as string;
+  }
+  return undefined;
+};
+
+const resolveEnvValue = (keys: string[]) => {
+  for (const key of keys) {
+    const value = readEnvValue(key);
+    if (value) return value;
+  }
+  return undefined;
+};
+
+const resolveConfig = (config: ObserverConfig): ResolvedObserverConfig => {
+  const baseUrl =
+    config.baseUrl ??
+    resolveEnvValue([
+      "PUSHLAB_OBSERVER_URL",
+      "VITE_PUSHLAB_OBSERVER_URL",
+      "NEXT_PUBLIC_PUSHLAB_OBSERVER_URL",
+      "REACT_APP_PUSHLAB_OBSERVER_URL",
+    ]);
+  const apiKey =
+    config.apiKey ??
+    resolveEnvValue([
+      "PUSHLAB_OBSERVER_API_KEY",
+      "VITE_PUSHLAB_OBSERVER_API_KEY",
+      "NEXT_PUBLIC_PUSHLAB_OBSERVER_API_KEY",
+      "REACT_APP_PUSHLAB_OBSERVER_API_KEY",
+    ]);
+
+  if (!baseUrl) {
+    throw new Error("Observer baseUrl is required.");
+  }
+  if (!apiKey) {
+    throw new Error("Observer apiKey is required.");
+  }
+
+  return {
+    maxBatchSize: DEFAULT_BATCH_SIZE,
+    flushIntervalMs: DEFAULT_FLUSH_INTERVAL,
+    ...config,
+    baseUrl,
+    apiKey,
+  };
+};
+
 export class ObserverClient {
-  private readonly config: ObserverConfig;
+  private readonly config: ResolvedObserverConfig;
   private readonly queue: ObserverLogEntry[] = [];
   private flushTimer?: number;
   private defaultContext?: unknown;
   private defaultTags?: unknown;
 
   constructor(config: ObserverConfig) {
-    this.config = {
-      maxBatchSize: DEFAULT_BATCH_SIZE,
-      flushIntervalMs: DEFAULT_FLUSH_INTERVAL,
-      ...config,
-    };
+    this.config = resolveConfig(config);
   }
 
   setContext(context: unknown) {

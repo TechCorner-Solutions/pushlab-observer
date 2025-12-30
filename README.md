@@ -57,8 +57,8 @@ Creates an `ObserverClient` instance.
 
 ```ts
 type ObserverConfig = {
-  baseUrl: string;
-  apiKey: string;
+  baseUrl?: string;
+  apiKey?: string;
   appName: string;
   source?: string;
   componentId?: string;
@@ -66,6 +66,25 @@ type ObserverConfig = {
   flushIntervalMs?: number;
   onError?: (error: unknown) => void;
 };
+```
+
+You can also omit `baseUrl` and `apiKey` and let the client read from environment variables:
+
+- `PUSHLAB_OBSERVER_URL`
+- `PUSHLAB_OBSERVER_API_KEY`
+- `VITE_PUSHLAB_OBSERVER_URL`
+- `VITE_PUSHLAB_OBSERVER_API_KEY`
+- `NEXT_PUBLIC_PUSHLAB_OBSERVER_URL`
+- `NEXT_PUBLIC_PUSHLAB_OBSERVER_API_KEY`
+- `REACT_APP_PUSHLAB_OBSERVER_URL`
+- `REACT_APP_PUSHLAB_OBSERVER_API_KEY`
+
+Example:
+
+```ts
+const observer = createObserver({
+  appName: "my-service",
+});
 ```
 
 Defaults:
