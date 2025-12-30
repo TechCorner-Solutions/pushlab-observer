@@ -1,6 +1,7 @@
 {
   "name": "@techcorner-solutions/pushlab-observer",
   "version": "0.0.1",
+  "author": "TechCorner Solutions",
   "description": "PushLab observer client for log ingestion",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
