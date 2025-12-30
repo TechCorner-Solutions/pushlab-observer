@@ -1,0 +1,43 @@
+name: Publish Node package (GitHub + npm)
+
+on:
+  push:
+    tags:
+      - 'v*'     # ex: v0.1.0, v1.0.0 etc.
+
+jobs:
+  publish-github-and-npm:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write     # necesar pentru GitHub Packages
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build
+        run: npm run build --if-present
+
+      # 1) Publish to GitHub Packages
+      - name: Publish to GitHub Packages
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_CONFIG_REGISTRY: https://npm.pkg.github.com
+
+      # 2) Publish to npmjs.com
+      - name: Publish to npmjs
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org
