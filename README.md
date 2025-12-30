@@ -1,11 +1,11 @@
-# pushlab-observer
+# @techcorner-solutions/pushlab-observer
 
 PushLab observer client for log ingestion across backend, frontend, desktop, and worker apps.
 
 ## Install
 
 ```bash
-npm install pushlab-observer
+npm install @techcorner-solutions/pushlab-observer
 ```
 
 ## What it does
@@ -27,7 +27,7 @@ Key fields:
 ## Quick start
 
 ```ts
-import { createObserver } from "pushlab-observer";
+import { createObserver } from "@techcorner-solutions/pushlab-observer";
 
 const observer = createObserver({
   baseUrl: "https://w8cdn.techspot.solutions",
