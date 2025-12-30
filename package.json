@@ -1,0 +1,18 @@
+{
+  "name": "pushlab-observer",
+  "version": "0.0.1",
+  "description": "PushLab observer client for log ingestion",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.7.3"
+  }
+}
